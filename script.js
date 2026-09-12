@@ -1,8 +1,8 @@
-/* 	File: script.js 
+// 	File: script.js 
 	Author: Shayan Siddiqi
 	Date Created: 25/08/2026
 	Last Modified: 12/09/2026
-*/
+//
 
 import kaboom from "https://unpkg.com/kaplay@3001.0.19/dist/kaplay.mjs";
 
@@ -561,10 +561,26 @@ scene("game", ({ levelId } = { levelId: 0 }) => {
 	let inputLocked = false
 	let isPaused = false
 
+	// Tracked manually via onKeyPress/onKeyRelease (edge events) rather than
+	// polled every frame with onKeyDown. This matters because debug.paused
+	// stops frame processing entirely, and KAPLAY's own per-frame "is this
+	// key still held" bookkeeping happens during that processing — so a key
+	// released while the game is frozen (mid-quiz) can be missed, leaving
+	// KAPLAY thinking the key is still down once unfrozen. Tracking releases
+	// ourselves, and force-clearing both flags the instant we freeze (see
+	// die()/portal handler/togglePause below), means movement always stops
+	// immediately and can only resume on a genuine new keypress.
+	let movingLeft = false
+	let movingRight = false
+
 	function togglePause() {
 		if (inputLocked && !isPaused) return // don't allow pausing while a quiz is open
 		isPaused = !isPaused
 		inputLocked = isPaused
+		if (isPaused) {
+			movingLeft = false
+			movingRight = false
+		}
 		debug.paused = isPaused
 		pauseModal.classList.toggle("hidden", !isPaused)
 	}
@@ -583,6 +599,8 @@ scene("game", ({ levelId } = { levelId: 0 }) => {
 	pauseMenuBtn.onclick = () => {
 		isPaused = false
 		inputLocked = false
+		movingLeft = false
+		movingRight = false
 		debug.paused = false
 		pauseModal.classList.add("hidden")
 		gameContainer.classList.add("hidden")
@@ -592,8 +610,15 @@ scene("game", ({ levelId } = { levelId: 0 }) => {
 	// Pauses the game and shows a question. Whatever the outcome, the player
 	// respawns — at the start of this level on death, or the next level
 	// (or the win screen) after completing one.
+	//
+	// Guarded by inputLocked so a single frame where two collisions happen
+	// at once (e.g. touching a spike and the box tile together) can't fire
+	// die() twice and stack two questions on top of each other.
 	function die() {
+		if (inputLocked) return
 		inputLocked = true
+		movingLeft = false
+		movingRight = false
 		debug.paused = true
 		askQuestion((correct) => afterQuiz(correct, levelId, false))
 	}
@@ -620,7 +645,10 @@ scene("game", ({ levelId } = { levelId: 0 }) => {
 	})
 
 	player.onCollide("portal", () => {
+		if (inputLocked) return
 		inputLocked = true
+		movingLeft = false
+		movingRight = false
 		debug.paused = true
 		const isFinalLevel = levelId + 1 >= LEVELS.length
 		askQuestion((correct) => afterQuiz(correct, isFinalLevel ? null : levelId + 1, isFinalLevel))
@@ -683,14 +711,26 @@ scene("game", ({ levelId } = { levelId: 0 }) => {
 
 	onKeyPress("w", jump)
 
-	onKeyDown("a", () => {
-		if (inputLocked) return
-		player.move(-MOVE_SPEED, 0)
+	onKeyPress("a", () => {
+		movingLeft = true
 	})
 
-	onKeyDown("d", () => {
+	onKeyRelease("a", () => {
+		movingLeft = false
+	})
+
+	onKeyPress("d", () => {
+		movingRight = true
+	})
+
+	onKeyRelease("d", () => {
+		movingRight = false
+	})
+
+	onUpdate(() => {
 		if (inputLocked) return
-		player.move(MOVE_SPEED, 0)
+		if (movingLeft) player.move(-MOVE_SPEED, 0)
+		if (movingRight) player.move(MOVE_SPEED, 0)
 	})
 
 	onKeyPress("s", () => {
