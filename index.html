@@ -1,0 +1,274 @@
+ <!--
+  File: index.html
+	Author: Shayan Siddiqi
+	Date Created: 24/08/2026
+	Last Modified: 12/09/2026
+-->
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>QuizQuest</title>
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #0F172A;
+      color: #F2F7F2;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    header.heading-div {
+      padding: 40px;
+      text-align: center;
+      background: #1E293B;
+      color: #F2F7F2;
+      font-size: 30px;
+    }
+
+    /* ---------- Menu screens ---------- */
+
+    .menu-screen {
+      max-width: 500px;
+      margin: 40px auto;
+      padding: 40px;
+      background: #1E293B;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .menu-screen h2 {
+      margin-top: 0;
+    }
+
+    .coin-display {
+      color: #15A297;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .menu-button {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      margin: 10px 0;
+      font-size: 18px;
+      background: #0F172A;
+      color: #F2F7F2;
+      border: 2px solid #59656F;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .menu-button:hover {
+      border-color: #15A297;
+    }
+
+    .menu-button.active {
+      border-color: #15A297;
+      background: #59656F;
+    }
+
+    .back-button {
+      margin-top: 20px;
+      background: transparent;
+      color: #59656F;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      text-decoration: underline;
+    }
+
+    /* ---------- Skins list ---------- */
+
+    .skin-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      margin: 8px 0;
+      background: #0F172A;
+      border-radius: 8px;
+    }
+
+    .skin-row button {
+      padding: 8px 14px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      background: #15A297;
+      color: #0F172A;
+      font-weight: bold;
+    }
+
+    .skin-row button:disabled {
+      background: #59656F;
+      color: #59656F;
+      cursor: not-allowed;
+    }
+
+    /* ---------- Controls list ---------- */
+
+    .controls-list {
+      text-align: left;
+      margin: 20px 0;
+    }
+
+    .controls-list div {
+      padding: 6px 0;
+      border-bottom: 1px solid #59656F;
+    }
+
+    /* ---------- Game container ---------- */
+
+    #game-container {
+      width: 800px;
+      height: 450px;
+      margin: 20px auto;
+      border: 4px solid #59656F;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #game-container canvas {
+      display: block;
+    }
+
+    /* ---------- Question modal ---------- */
+
+    #question-modal,
+    #pause-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .question-box {
+      background: #0F172A;
+      border: 2px solid #15A297;
+      border-radius: 12px;
+      padding: 30px;
+      width: 420px;
+      max-width: 90%;
+      text-align: center;
+    }
+
+    #question-text {
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+
+    #answer-buttons,
+    #pause-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .answer-btn {
+      padding: 12px;
+      font-size: 16px;
+      background: #1E293B;
+      color: #F2F7F2;
+      border: 2px solid #59656F;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .answer-btn:hover {
+      border-color: #15A297;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <header class="heading-div">
+    <h1>Welcome to QuizQuest</h1>
+  </header>
+
+  <!-- ============ MAIN MENU ============ -->
+  <div id="main-menu" class="menu-screen">
+    <h2>QuizQuest</h2>
+    <div class="coin-display" id="main-menu-coins">Coins: 0</div>
+    <button class="menu-button" id="play-btn">Play</button>
+    <button class="menu-button" id="subject-btn">Choose Subject</button>
+    <button class="menu-button" id="skins-btn">Skins</button>
+    <button class="menu-button" id="controls-btn">Controls</button>
+  </div>
+
+  <!-- ============ SUBJECT MENU ============ -->
+  <div id="subject-menu" class="menu-screen hidden">
+    <h2>Choose a Subject</h2>
+    <div id="subject-list"></div>
+    <button class="back-button" data-back>Back</button>
+  </div>
+
+  <!-- ============ SKINS MENU ============ -->
+  <div id="skins-menu" class="menu-screen hidden">
+    <h2>Skins</h2>
+    <div class="coin-display" id="skins-menu-coins">Coins: 0</div>
+    <div id="skins-list"></div>
+    <button class="back-button" data-back>Back</button>
+  </div>
+
+  <!-- ============ CONTROLS MENU ============ -->
+  <div id="controls-menu" class="menu-screen hidden">
+    <h2>Controls</h2>
+    <div class="controls-list">
+      <div><strong>A</strong> — Move left</div>
+      <div><strong>D</strong> — Move right</div>
+      <div><strong>W</strong> — Jump</div>
+      <div><strong>S</strong> (hold) — Fall faster</div>
+      <div><strong>F</strong> — Toggle fullscreen</div>
+      <div><strong>ESC</strong> — Pause / return to main menu</div>
+    </div>
+    <button class="back-button" data-back>Back</button>
+  </div>
+
+  <!-- ============ GAME ============ -->
+  <div id="game-container" class="hidden"></div>
+
+  <!-- ============ QUESTION MODAL ============ -->
+  <div id="question-modal" class="hidden">
+    <div class="question-box">
+      <h3 id="question-text"></h3>
+      <div id="answer-buttons"></div>
+    </div>
+  </div>
+
+  <!-- ============ PAUSE MODAL ============ -->
+  <div id="pause-modal" class="hidden">
+    <div class="question-box">
+      <h3>Paused</h3>
+      <div id="pause-buttons">
+        <button class="answer-btn" id="resume-btn">Resume</button>
+        <button class="answer-btn" id="pause-menu-btn">Return to Main Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="script.js"></script>
+</body>
+
+</html>
