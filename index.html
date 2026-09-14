@@ -2,9 +2,8 @@
   File: index.html
 	Author: Shayan Siddiqi
 	Date Created: 24/08/2026
-	Last Modified: 12/09/2026
+	Last Modified: 14/09/2026
 -->
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -88,6 +87,32 @@
       cursor: pointer;
       font-size: 16px;
       text-decoration: underline;
+    }
+
+    /* ---------- Name entry ---------- */
+
+    .name-input {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin: 20px 0 10px;
+      font-size: 18px;
+      background: #0F172A;
+      color: #F2F7F2;
+      border: 2px solid #59656F;
+      border-radius: 8px;
+    }
+
+    .name-input:focus {
+      outline: none;
+      border-color: #15A297;
+    }
+
+    .name-error {
+      color: #FCA5A5;
+      font-size: 14px;
+      margin-bottom: 10px;
+      text-align: left;
     }
 
     /* ---------- Skins list ---------- */
@@ -207,11 +232,19 @@
     <h1>Welcome to QuizQuest</h1>
   </header>
 
+  <!-- ============ NAME ENTRY ============ -->
+  <div id="name-entry-screen" class="menu-screen">
+    <h2>Enter Your Name</h2>
+    <input type="text" id="player-name-input" class="name-input" placeholder="Your name" maxlength="15">
+    <div id="name-error" class="name-error hidden"></div>
+    <button class="menu-button" id="name-continue-btn">Continue</button>
+  </div>
+
   <!-- ============ MAIN MENU ============ -->
-  <div id="main-menu" class="menu-screen">
+  <div id="main-menu" class="menu-screen hidden">
     <h2>QuizQuest</h2>
     <div class="coin-display" id="main-menu-coins">Coins: 0</div>
-    <button class="menu-button" id="play-btn">Play</button>
+    <button class="menu-button" id="play-btn" disabled>Loading...</button>
     <button class="menu-button" id="subject-btn">Choose Subject</button>
     <button class="menu-button" id="skins-btn">Skins</button>
     <button class="menu-button" id="controls-btn">Controls</button>
