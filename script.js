@@ -1,8 +1,8 @@
-// 	File: script.js 
-//	Author: Shayan Siddiqi
-//	Date Created: 25/08/2026
-//	Last Modified: 12/09/2026
-
+/* 	File: script.js 
+	Author: Shayan Siddiqi
+	Date Created: 25/08/2026
+	Last Modified: 12/09/2026
+*/
 
 import kaboom from "https://unpkg.com/kaplay@3001.0.19/dist/kaplay.mjs";
 
@@ -14,6 +14,7 @@ import kaboom from "https://unpkg.com/kaplay@3001.0.19/dist/kaplay.mjs";
    ============================================================ */
 
 const state = {
+	playerName: "",
 	coins: 0,
 	subject: "Biology",
 	ownedSkins: ["blob"],
@@ -23,119 +24,26 @@ const state = {
 const COINS_PER_CORRECT_ANSWER = 5;
 
 /* ============================================================
-   QUESTION BANK — 5 questions per subject, 1 correct + 3 incorrect
+   QUESTIONS loaded from data/questions.json (an external data
+   source)
+   5 questions per subject, 1 correct + 3 incorrect. 
+   Populated by loadQuestions() before the Play button is enabled (see below).
    ============================================================ */
 
-const QUESTIONS = {
-	Biology: [
-		{
-			question: "What is the primary function of the mitochondria in a cell?",
-			correct: "Produce energy (ATP) for the cell",
-			incorrect: ["Store genetic information", "Synthesise proteins", "Control cell movement"],
-		},
-		{
-			question: "Which biomolecule is the primary carrier of genetic information?",
-			correct: "DNA",
-			incorrect: ["Lipids", "Carbohydrates", "ATP"],
-		},
-		{
-			question: "What is the process by which plants convert light energy into chemical energy?",
-			correct: "Photosynthesis",
-			incorrect: ["Respiration", "Fermentation", "Transpiration"],
-		},
-		{
-			question: "Which blood cells are primarily responsible for fighting infection?",
-			correct: "White blood cells",
-			incorrect: ["Red blood cells", "Platelets", "Plasma"],
-		},
-		{
-			question: "What is the basic structural and functional unit of all living organisms?",
-			correct: "The cell",
-			incorrect: ["The atom", "The organ", "The tissue"],
-		},
-	],
-	Physics: [
-		{
-			question: "What is the SI unit of force?",
-			correct: "Newton",
-			incorrect: ["Joule", "Watt", "Pascal"],
-		},
-		{
-			question: "According to Newton's First Law, an object at rest stays at rest unless acted on by:",
-			correct: "An unbalanced external force",
-			incorrect: ["Gravity alone", "Its own mass", "Friction only"],
-		},
-		{
-			question: "Which formula correctly calculates kinetic energy?",
-			correct: "½ × mass × velocity²",
-			incorrect: ["mass × gravity × height", "force × distance", "mass × velocity"],
-		},
-		{
-			question: "What type of energy is stored in a stretched spring?",
-			correct: "Elastic potential energy",
-			incorrect: ["Kinetic energy", "Thermal energy", "Chemical energy"],
-		},
-		{
-			question: "What happens to the wavelength of light as its frequency increases?",
-			correct: "It decreases",
-			incorrect: ["It increases", "It stays the same", "It becomes zero"],
-		},
-	],
-	Chemistry: [
-		{
-			question: "The atomic number of an element is determined by its number of:",
-			correct: "Protons",
-			incorrect: ["Neutrons", "Electrons only", "Atomic mass"],
-		},
-		{
-			question: "Which type of bond involves the sharing of electron pairs between atoms?",
-			correct: "Covalent bond",
-			incorrect: ["Ionic bond", "Metallic bond", "Hydrogen bond"],
-		},
-		{
-			question: "What is the pH of a neutral solution at 25°C?",
-			correct: "7",
-			incorrect: ["0", "14", "1"],
-		},
-		{
-			question: "What is the name of the process where a solid changes directly to a gas?",
-			correct: "Sublimation",
-			incorrect: ["Evaporation", "Condensation", "Deposition"],
-		},
-		{
-			question: "Which gas is most abundant in Earth's atmosphere?",
-			correct: "Nitrogen",
-			incorrect: ["Oxygen", "Carbon dioxide", "Argon"],
-		},
-	],
-	Psychology: [
-		{
-			question: "Who is considered the founder of classical conditioning?",
-			correct: "Ivan Pavlov",
-			incorrect: ["B.F. Skinner", "Sigmund Freud", "Jean Piaget"],
-		},
-		{
-			question: "What term describes learning through rewards and punishments?",
-			correct: "Operant conditioning",
-			incorrect: ["Classical conditioning", "Observational learning", "Cognitive mapping"],
-		},
-		{
-			question: "Which part of the brain is primarily responsible for forming new long-term memories?",
-			correct: "Hippocampus",
-			incorrect: ["Cerebellum", "Amygdala", "Medulla"],
-		},
-		{
-			question: "What is the term for the tendency to seek information that confirms existing beliefs?",
-			correct: "Confirmation bias",
-			incorrect: ["Hindsight bias", "Actor-observer bias", "Availability heuristic"],
-		},
-		{
-			question: "According to Maslow's hierarchy of needs, which need must be met first?",
-			correct: "Physiological needs",
-			incorrect: ["Self-actualisation", "Esteem", "Belonging"],
-		},
-	],
-};
+let QUESTIONS = {};
+
+async function loadQuestions() {
+	const playBtn = document.getElementById("play-btn");
+	try {
+		const response = await fetch("data/questions.json");
+		QUESTIONS = await response.json();
+		playBtn.disabled = false;
+		playBtn.textContent = "Play";
+	} catch (err) {
+		console.error("Failed to load questions.json:", err);
+		playBtn.textContent = "Failed to load data";
+	}
+}
 
 let lastQuestionIndex = -1;
 
@@ -148,6 +56,7 @@ function getRandomQuestion(subject) {
 	lastQuestionIndex = index;
 	return bank[index];
 }
+
 
 function shuffle(array) {
 	const copy = [...array];
@@ -179,6 +88,11 @@ const skinsMenu = document.getElementById("skins-menu");
 const controlsMenu = document.getElementById("controls-menu");
 const gameContainer = document.getElementById("game-container");
 
+const nameEntryScreen = document.getElementById("name-entry-screen");
+const playerNameInput = document.getElementById("player-name-input");
+const nameError = document.getElementById("name-error");
+const nameContinueBtn = document.getElementById("name-continue-btn");
+
 const mainMenuCoins = document.getElementById("main-menu-coins");
 const skinsMenuCoins = document.getElementById("skins-menu-coins");
 const subjectList = document.getElementById("subject-list");
@@ -204,6 +118,54 @@ function updateCoinDisplays() {
 	mainMenuCoins.textContent = `Coins: ${state.coins}`;
 	skinsMenuCoins.textContent = `Coins: ${state.coins}`;
 }
+
+/* ---------- Name entry ---------- */
+
+/**
+ * Validates the entered player name against three checks:
+ * existence (not empty), type (letters only — no numbers, spaces, or
+ * symbols), and range (3 to 15 characters). Returns an error message
+ * string if invalid, or null if the name is valid.
+ */
+function validatePlayerName(rawName) {
+	const name = rawName.trim();
+
+	// Existence check
+	if (name.length === 0) {
+		return "Please enter a name.";
+	}
+
+	// Type check — letters only, no numbers, spaces, or symbols
+	if (!/^[A-Za-z]+$/.test(name)) {
+		return "Name can only contain letters (no numbers, spaces, or symbols).";
+	}
+
+	// Range check — between 3 and 15 characters
+	if (name.length < 3 || name.length > 15) {
+		return "Name must be between 3 and 15 characters.";
+	}
+
+	return null;
+}
+
+function submitPlayerName() {
+	const error = validatePlayerName(playerNameInput.value);
+	if (error) {
+		nameError.textContent = error;
+		nameError.classList.remove("hidden");
+		return;
+	}
+	state.playerName = playerNameInput.value.trim();
+	nameError.classList.add("hidden");
+	nameEntryScreen.classList.add("hidden");
+	showMenu(mainMenu);
+}
+
+nameContinueBtn.onclick = submitPlayerName;
+
+playerNameInput.addEventListener("keydown", (e) => {
+	if (e.key === "Enter") submitPlayerName();
+});
 
 /* ---------- Subject menu ---------- */
 
@@ -290,6 +252,7 @@ document.getElementById("play-btn").onclick = () => {
 };
 
 updateCoinDisplays();
+loadQuestions();
 
 /* ============================================================
    QUESTION MODAL
@@ -341,12 +304,15 @@ function afterQuiz(correct, correctNextLevelId, isFinal) {
    KAPLAY SETUP
    ============================================================ */
 
+// Setting Properties for game window
 kaboom({
 	width: 800,
 	height: 450,
 	root: gameContainer,
 	background: [141, 183, 255],
 });
+
+// Sprites loaded from /sprites folder (64x64 png format)
 
 loadSprite("blob", "sprites/blob.png")
 loadSprite("bean", "sprites/bean.png")
@@ -421,7 +387,16 @@ const JUMP_FORCE = 1320
 const MOVE_SPEED = 480
 const FALL_DEATH = 2400
 
+
+/* ============================================================
+   GAME LEVELS SET-UP
+   ============================================================ */
+
+
+// ASCII level graph
+// Allows creating levels by representing each item/block as a symbol.
 const LEVELS = [
+	// Level 1
 	[
 		"    0       ",
 		"   --       ",
@@ -431,21 +406,23 @@ const LEVELS = [
 		"   ^^  > = @",
 		"============",
 	],
+	// Level 2
 	[
 		"                          $",
 		"                          $",
 		"                          $",
 		"                          $",
 		"                          $",
-		"           $$         =   $",
-		"  %      ====         =   $",
-		"                      =   $",
-		"                      =    ",
-		"       ^^      = >    =   @",
+		"           $$         -   $",
+		"  %      ====         -   $",
+		"                      -   $",
+		"                      -    ",
+		"   ^   ^^      = >    -   @",
 		"===========================",
 	],
+	// Level 3
 	[
-		"     $  $    $   $    $    ",
+		"     $  $    $   0    $    ",
 		"     $  $    $   $    $    ",
 		"                           ",
 		"                           ",
@@ -537,6 +514,7 @@ const levelConf = {
 	},
 }
 
+
 scene("game", ({ levelId } = { levelId: 0 }) => {
 
 	setGravity(BASE_GRAVITY)
@@ -561,15 +539,11 @@ scene("game", ({ levelId } = { levelId: 0 }) => {
 	let inputLocked = false
 	let isPaused = false
 
-	// Tracked manually via onKeyPress/onKeyRelease (edge events) rather than
-	// polled every frame with onKeyDown. This matters because debug.paused
-	// stops frame processing entirely, and KAPLAY's own per-frame "is this
-	// key still held" bookkeeping happens during that processing — so a key
-	// released while the game is frozen (mid-quiz) can be missed, leaving
-	// KAPLAY thinking the key is still down once unfrozen. Tracking releases
-	// ourselves, and force-clearing both flags the instant we freeze (see
-	// die()/portal handler/togglePause below), means movement always stops
+	// Movement 
+	// Tracked manually via onKeyPress/onKeyRelease
+	// Movement always stops after pause/question box 
 	// immediately and can only resume on a genuine new keypress.
+
 	let movingLeft = false
 	let movingRight = false
 
@@ -622,28 +596,48 @@ scene("game", ({ levelId } = { levelId: 0 }) => {
 		debug.paused = true
 		askQuestion((correct) => afterQuiz(correct, levelId, false))
 	}
-
+ 
+	// Runs every frame the player object exists. Keeps the camera locked to
+	// the player (so the level scrolls with them), and checks whether they've
+	// fallen off the bottom of the level — this is the only death condition
+	// that isn't a collision, so it has to be polled here instead.
 	player.onUpdate(() => {
 		camPos(player.pos)
 		if (player.pos.y >= FALL_DEATH) {
 			die()
 		}
 	})
-
+ 
+	// Lets the player jump UP through a platform/soft tile from underneath,
+	// by cancelling the physics engine's collision response while they're
+	// still rising. Without this, platform tiles would block the player
+	// from both directions, making platforms impossible to jump onto from
+	// below.
 	player.onBeforePhysicsResolve((collision) => {
 		if (collision.target.is(["platform", "soft"]) && player.isJumping()) {
 			collision.preventResolution()
 		}
 	})
-
+ 
+	// Physics resolution (gravity, collisions) can move the player after
+	// onUpdate has already run this frame, so the camera is re-centred here
+	// too — otherwise it would lag one frame behind the player during
+	// collisions.
 	player.onPhysicsResolve(() => {
 		camPos(player.pos)
 	})
-
+ 
+	// Spikes and similar hazards are tagged "danger" in levelConf — touching
+	// any of them is an instant death.
 	player.onCollide("danger", () => {
 		die()
 	})
-
+ 
+	// Reaching the level's portal tile either advances to the next level or,
+	// on the final level, ends the game. Either way a question is asked
+	// first (see askQuestion/afterQuiz above) — inputLocked guards against
+	// this firing more than once if the collision is detected on two
+	// consecutive frames before debug.paused actually takes effect.
 	player.onCollide("portal", () => {
 		if (inputLocked) return
 		inputLocked = true
@@ -653,7 +647,10 @@ scene("game", ({ levelId } = { levelId: 0 }) => {
 		const isFinalLevel = levelId + 1 >= LEVELS.length
 		askQuestion((correct) => afterQuiz(correct, isFinalLevel ? null : levelId + 1, isFinalLevel))
 	})
-
+ 
+	// Landing on top of an enemy defeats it (a classic stomp mechanic): the
+	// player bounces up higher than a normal jump, the enemy is removed,
+	// and a small particle burst (addKaboom) plays at the point of contact.
 	player.onGround((l) => {
 		if (l.is("enemy")) {
 			player.jump(JUMP_FORCE * 1.5)
@@ -661,21 +658,31 @@ scene("game", ({ levelId } = { levelId: 0 }) => {
 			addKaboom(player.pos)
 		}
 	})
-
+ 
+	// Touching an enemy from any side OTHER than directly on top (handled
+	// separately above) is a death — this is what makes stomping enemies
+	// safe but walking into them dangerous.
 	player.onCollide("enemy", (e, col) => {
 		if (!col.isBottom()) {
 			die()
 		}
 	})
-
+ 
+	// The box/"devil" tile is also a hazard — touching it from any direction
+	// kills the player, unlike a normal platform tile.
 	player.onCollide("devil", (e, col) => {
 		
 		die()
 	
 	})
-
+ 
+	// Tracks whether the player is currently carrying the power-up apple
+	// spawned from a "prize" block, so headbutting the same block twice in a
+	// row doesn't spawn a second apple before the first has been collected.
 	let hasApple = false
-
+ 
+	// Hitting the underside of a "prize" block spawns a bonus apple above
+	// it (mirroring the classic "hit block from below" power-up pattern).
 	player.onHeadbutt((obj) => {
 		if (obj.is("prize") && !hasApple) {
 			const apple = level.spawn("#", obj.tilePos.sub(0, 1))
@@ -683,82 +690,102 @@ scene("game", ({ levelId } = { levelId: 0 }) => {
 			hasApple = true
 		}
 	})
-
+ 
+	// Collecting the apple grows the player temporarily (via the big()
+	// component) and frees up hasApple so another one can be spawned later.
 	player.onCollide("apple", (a) => {
 		destroy(a)
 		player.biggify(3)
 		hasApple = false
 	})
-
+ 
+	// Coins are cosmetic currency, spent on skins in the shop menu. Picking
+	// one up removes it from the level, adds to the player's running total,
+	// and updates the on-screen HUD label to match.
 	player.onCollide("coin", (c) => {
 		destroy(c)
 		state.coins += 1
 		coinsLabel.text = "Coins: " + state.coins
 	})
-
+ 
+	// On-screen coin counter. fixed() keeps it pinned to the same screen
+	// position regardless of where the camera is looking at in the level.
 	const coinsLabel = add([
 		text("Coins: " + state.coins),
 		pos(24, 24),
 		fixed(),
 	])
-
+ 
+	// Jumping is only allowed while grounded (no double-jumping) and while
+	// input isn't locked (i.e. no quiz or pause menu is currently open).
 	function jump() {
 		if (inputLocked) return
 		if (player.isGrounded()) {
 			player.jump(JUMP_FORCE)
 		}
 	}
-
+ 
 	onKeyPress("w", jump)
-
+ 
+	// Left/right movement is tracked with these two boolean flags, set and
+	// cleared on the actual keydown/keyup events, rather than checked by
+	// polling "is the key currently down" every frame. This avoids a bug
+	// where debug.paused (used to freeze the game for the quiz) can cause a
+	// key release to be missed, leaving the player moving on its own after
+	// respawning — see die()/togglePause() above, which force both flags
+	// back to false the instant the game freezes.
 	onKeyPress("a", () => {
 		movingLeft = true
 	})
-
+ 
 	onKeyRelease("a", () => {
 		movingLeft = false
 	})
-
+ 
 	onKeyPress("d", () => {
 		movingRight = true
 	})
-
+ 
 	onKeyRelease("d", () => {
 		movingRight = false
 	})
-
+ 
+	// Applies the held-direction flags above once per frame. Movement is
+	// skipped entirely while inputLocked is true, so the player can't drift
+	// while a question or the pause menu is on screen.
 	onUpdate(() => {
 		if (inputLocked) return
 		if (movingLeft) player.move(-MOVE_SPEED, 0)
 		if (movingRight) player.move(MOVE_SPEED, 0)
 	})
-
+ 
+	// Holding "s" increases the player's weight, making them fall faster —
+	// released back to normal weight as soon as the key is let go.
 	onKeyPress("s", () => {
 		if (inputLocked) return
 		player.weight = 3
 	})
-
+ 
 	onKeyRelease("s", () => {
 		player.weight = 1
 	})
-
-	onGamepadButtonPress("south", jump)
-
-	onGamepadStick("left", (v) => {
-		if (inputLocked) return
-		player.move(v.x * MOVE_SPEED, 0)
-	})
-
+ 
+ 
+	// Lets the player toggle browser fullscreen at any time, independent of
+	// inputLocked, since it doesn't affect gameplay state.
 	onKeyPress("f", () => {
 		setFullscreen(!isFullscreen())
 	})
-
+ 
 })
-
+ 
+// Shown after completing the final level. Displays the validated player
+// name entered at the start and returns
+// to the main menu on any keypress.
 scene("win", () => {
 	add([
-		text("You Win!"),
-		pos(24, 24),
+		text("You Win! " + state.playerName),
+		pos(64, 64),
 		fixed(),
 	])
 	onKeyPress(() => {
@@ -766,5 +793,5 @@ scene("win", () => {
 		showMenu(mainMenu)
 	})
 })
-
+ 
 // The game does not auto-start — it waits for "Play" on the main menu (see above).
