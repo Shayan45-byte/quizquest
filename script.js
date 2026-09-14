@@ -1,7 +1,7 @@
 /* 	File: script.js 
 	Author: Shayan Siddiqi
 	Date Created: 25/08/2026
-	Last Modified: 12/09/2026
+	Last Modified: 14/09/2026
 */
 
 import kaboom from "https://unpkg.com/kaplay@3001.0.19/dist/kaplay.mjs";
