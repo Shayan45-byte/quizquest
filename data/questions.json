@@ -1,0 +1,110 @@
+{
+	"Biology": [
+		{
+			"question": "What is the primary function of the mitochondria in a cell?",
+			"correct": "Produce energy (ATP) for the cell",
+			"incorrect": ["Store genetic information", "Synthesise proteins", "Control cell movement"]
+		},
+		{
+			"question": "Which biomolecule is the primary carrier of genetic information?",
+			"correct": "DNA",
+			"incorrect": ["Lipids", "Carbohydrates", "ATP"]
+		},
+		{
+			"question": "What is the process by which plants convert light energy into chemical energy?",
+			"correct": "Photosynthesis",
+			"incorrect": ["Respiration", "Fermentation", "Transpiration"]
+		},
+		{
+			"question": "Which blood cells are primarily responsible for fighting infection?",
+			"correct": "White blood cells",
+			"incorrect": ["Red blood cells", "Platelets", "Plasma"]
+		},
+		{
+			"question": "What is the basic structural and functional unit of all living organisms?",
+			"correct": "The cell",
+			"incorrect": ["The atom", "The organ", "The tissue"]
+		}
+	],
+	"Physics": [
+		{
+			"question": "What is the SI unit of force?",
+			"correct": "Newton",
+			"incorrect": ["Joule", "Watt", "Pascal"]
+		},
+		{
+			"question": "According to Newton's First Law, an object at rest stays at rest unless acted on by:",
+			"correct": "An unbalanced external force",
+			"incorrect": ["Gravity alone", "Its own mass", "Friction only"]
+		},
+		{
+			"question": "Which formula correctly calculates kinetic energy?",
+			"correct": "½ × mass × velocity²",
+			"incorrect": ["mass × gravity × height", "force × distance", "mass × velocity"]
+		},
+		{
+			"question": "What type of energy is stored in a stretched spring?",
+			"correct": "Elastic potential energy",
+			"incorrect": ["Kinetic energy", "Thermal energy", "Chemical energy"]
+		},
+		{
+			"question": "What happens to the wavelength of light as its frequency increases?",
+			"correct": "It decreases",
+			"incorrect": ["It increases", "It stays the same", "It becomes zero"]
+		}
+	],
+	"Chemistry": [
+		{
+			"question": "The atomic number of an element is determined by its number of:",
+			"correct": "Protons",
+			"incorrect": ["Neutrons", "Electrons only", "Atomic mass"]
+		},
+		{
+			"question": "Which type of bond involves the sharing of electron pairs between atoms?",
+			"correct": "Covalent bond",
+			"incorrect": ["Ionic bond", "Metallic bond", "Hydrogen bond"]
+		},
+		{
+			"question": "What is the pH of a neutral solution at 25°C?",
+			"correct": "7",
+			"incorrect": ["0", "14", "1"]
+		},
+		{
+			"question": "What is the name of the process where a solid changes directly to a gas?",
+			"correct": "Sublimation",
+			"incorrect": ["Evaporation", "Condensation", "Deposition"]
+		},
+		{
+			"question": "Which gas is most abundant in Earth's atmosphere?",
+			"correct": "Nitrogen",
+			"incorrect": ["Oxygen", "Carbon dioxide", "Argon"]
+		}
+	],
+	"Psychology": [
+		{
+			"question": "Who is considered the founder of classical conditioning?",
+			"correct": "Ivan Pavlov",
+			"incorrect": ["B.F. Skinner", "Sigmund Freud", "Jean Piaget"]
+		},
+		{
+			"question": "What term describes learning through rewards and punishments?",
+			"correct": "Operant conditioning",
+			"incorrect": ["Classical conditioning", "Observational learning", "Cognitive mapping"]
+		},
+		{
+			"question": "Which part of the brain is primarily responsible for forming new long-term memories?",
+			"correct": "Hippocampus",
+			"incorrect": ["Cerebellum", "Amygdala", "Medulla"]
+		},
+		{
+			"question": "What is the term for the tendency to seek information that confirms existing beliefs?",
+			"correct": "Confirmation bias",
+			"incorrect": ["Hindsight bias", "Actor-observer bias", "Availability heuristic"]
+		},
+		{
+			"question": "According to Maslow's hierarchy of needs, which need must be met first?",
+			"correct": "Physiological needs",
+			"incorrect": ["Self-actualisation", "Esteem", "Belonging"]
+		}
+	]
+}
