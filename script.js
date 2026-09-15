@@ -119,6 +119,16 @@ function updateCoinDisplays() {
 	skinsMenuCoins.textContent = `Coins: ${state.coins}`;
 }
 
+// Restores keyboard focus to the game canvas. Clicking a normal HTML
+// button (a quiz answer, or the pause menu's Resume button) moves the
+// browser's keyboard focus onto that button — without this, the player
+// would have to click the game itself once before movement/jump keys
+// would respond again after closing a modal.
+function focusGameCanvas() {
+	const canvas = gameContainer.querySelector("canvas");
+	if (canvas) canvas.focus();
+}
+
 /* ---------- Name entry ---------- */
 
 /**
@@ -249,6 +259,7 @@ document.getElementById("play-btn").onclick = () => {
 	mainMenu.classList.add("hidden");
 	gameContainer.classList.remove("hidden");
 	go("game", { levelId: 0 });
+	focusGameCanvas();
 };
 
 updateCoinDisplays();
@@ -271,6 +282,7 @@ function askQuestion(onAnswered) {
 		btn.textContent = option;
 		btn.onclick = () => {
 			questionModal.classList.add("hidden");
+			focusGameCanvas();
 			onAnswered(option === q.correct);
 		};
 		answerButtons.appendChild(btn);
@@ -432,6 +444,19 @@ const LEVELS = [
 		" ^^^^>^^^^>^^^^>^^^^>^^^^^@",
 		"===========================",
 	],
+	// level 4
+	[
+		"                            ",
+		"                            ",
+		"          ===               ",
+		"     $                      ",
+		"    ===       $             ",
+		"             ====           ",
+		"                 %          ",
+		"           ^                ",
+		" =   > =   =              @ ",
+		"========   ======         ==",
+	]
 ]
 
 // define what each symbol means in the level graph
@@ -562,7 +587,10 @@ scene("game", ({ levelId } = { levelId: 0 }) => {
 	onKeyPress("escape", togglePause)
 
 	resumeBtn.onclick = () => {
-		if (isPaused) togglePause()
+		if (isPaused) {
+			togglePause()
+			focusGameCanvas()
+		}
 	}
 
 	// IMPORTANT: debug.paused freezes KAPLAY's render loop entirely, not just
@@ -768,13 +796,6 @@ scene("game", ({ levelId } = { levelId: 0 }) => {
  
 	onKeyRelease("s", () => {
 		player.weight = 1
-	})
- 
- 
-	// Lets the player toggle browser fullscreen at any time, independent of
-	// inputLocked, since it doesn't affect gameplay state.
-	onKeyPress("f", () => {
-		setFullscreen(!isFullscreen())
 	})
  
 })
